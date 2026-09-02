@@ -81,8 +81,11 @@
           <label>滑軌</label>
           <select id="rail">
             <option value="0">不計滑軌</option>
-            <option value="45">45cm｜365元／組</option>
-            <option value="50">50cm｜385元／組</option>
+            <option value="35">35cm</option>
+            <option value="40">40cm</option>
+            <option value="45">45cm</option>
+            <option value="50">50cm</option>
+            <option value="55">55cm</option>
           </select>
         </div>
         <div><label>其他加工費（元）</label><input id="processing" type="number" min="0" step="1" value="0"></div>
@@ -108,8 +111,11 @@
       <div class="price-row"><div><label>8mm 背板（元／才）</label><input id="p8" type="number" value="100"></div><div></div></div>
       <div class="price-row"><div><label>門片（元／才）</label><input id="pDoor" type="number" value="145"></div><div></div></div>
       <div class="price-row"><div><label>抽屜本體（元／個）</label><input id="pDrawer" type="number" value="1000"></div><div></div></div>
+      <div class="price-row"><div><label>35cm 滑軌（元／組）</label><input id="pRail35" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>40cm 滑軌（元／組）</label><input id="pRail40" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
       <div class="price-row"><div><label>45cm 滑軌（元／組）</label><input id="pRail45" type="number" value="365"></div><div></div></div>
       <div class="price-row"><div><label>50cm 滑軌（元／組）</label><input id="pRail50" type="number" value="385"></div><div></div></div>
+      <div class="price-row"><div><label>55cm 滑軌（元／組）</label><input id="pRail55" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
       <div class="price-row"><div><label>25mm 檯面（元／才）</label><input id="p25" type="number" value="280"></div><div></div></div>
       <button class="btn secondary" id="savePrice">儲存單價</button>
       <p class="hint">單價會存在這台裝置的瀏覽器內，可自行修改。</p>
@@ -151,8 +157,8 @@ const fmt = n => '$' + Math.round(n).toLocaleString('zh-TW');
 const f2 = n => (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'');
 const tsai = (a,b) => a*b/900;
 
-const priceIds = ['p18','p8','pDoor','pDrawer','pRail45','pRail50','p25'];
-const defaultPrices = {p18:135,p8:100,pDoor:145,pDrawer:1000,pRail45:365,pRail50:385,p25:280};
+const priceIds = ['p18','p8','pDoor','pDrawer','pRail35','pRail40','pRail45','pRail50','pRail55','p25'];
+const defaultPrices = {p18:135,p8:100,pDoor:145,pDrawer:1000,pRail35:0,pRail40:0,pRail45:365,pRail50:385,pRail55:0,p25:280};
 
 function loadPrices(){
   const saved = JSON.parse(localStorage.getItem('cabinetPricesV1') || '{}');
@@ -194,7 +200,8 @@ function calculate(v){
   const doorTsai = v.doors>0 ? tsai(v.w,v.h) : 0; // 門片拆幾片，總才數仍以整體 W×H 快估
   const counterTsai = v.countertop ? tsai(v.w,v.d) : 0;
 
-  const railPrice = v.rail==='45' ? p.pRail45 : v.rail==='50' ? p.pRail50 : 0;
+  const railMap = {'35':p.pRail35,'40':p.pRail40,'45':p.pRail45,'50':p.pRail50,'55':p.pRail55};
+  const railPrice = railMap[v.rail] || 0;
   const items = [
     {name:'18mm 側板 2片', qty:sideTsai, unit:'才', amount:sideTsai*p.p18},
     {name:'18mm 頂底板 2片', qty:topBottomTsai, unit:'才', amount:topBottomTsai*p.p18},
