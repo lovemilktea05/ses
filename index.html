@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>系統櫃快速拆料估價</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --accent:#111827; --soft:#f3f4f6; --danger:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:16px}
+  h1{font-size:24px;margin:4px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card h2{font-size:18px;margin:0 0 12px}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .row2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+  input,select,button{width:100%;font:inherit}
+  input,select{border:1px solid #d1d5db;border-radius:10px;padding:10px;background:#fff;color:var(--text)}
+  input[type=checkbox]{width:auto;transform:scale(1.2);margin-right:8px}
+  .check{display:flex;align-items:center;border:1px solid var(--line);padding:10px 12px;border-radius:10px;background:#fff}
+  .btn{border:0;border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--accent);color:white;font-weight:700}
+  .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+  .btn.danger{background:#fff;color:var(--danger);border:1px solid #fecaca}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .price-row{display:grid;grid-template-columns:1fr 120px;gap:10px;align-items:end;margin-bottom:8px}
+  .hint{font-size:12px;color:var(--muted);line-height:1.5}
+  .warn{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:8px 10px;border-radius:10px;margin-top:8px;display:none}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  tfoot td{font-weight:800}
+  .money{font-size:28px;font-weight:800;margin:4px 0}
+  .muted{color:var(--muted)}
+  .cabinet{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:#fff}
+  .cabinet-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .cabinet-title{font-weight:800}
+  .small{font-size:12px}
+  .pill{display:inline-block;background:var(--soft);border-radius:999px;padding:4px 8px;margin:2px 4px 2px 0;font-size:12px}
+  .totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .tot{background:var(--soft);border-radius:10px;padding:10px}
+  .tot b{display:block;font-size:16px;margin-top:2px}
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr 1fr 1fr}
+    .totals{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>系統櫃快速拆料估價</h1>
+  <div class="sub">V1 初版｜快速抓才數與價格，不作工廠精準下料。</div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>新增櫃體</h2>
+      <div class="row">
+        <div><label>寬 W（cm）</label><input id="w" type="number" min="1" step="0.1" placeholder="40"></div>
+        <div><label>深 D（cm）</label><input id="d" type="number" min="1" step="0.1" placeholder="40"></div>
+        <div><label>高 H（cm）</label><input id="h" type="number" min="1" step="0.1" placeholder="180"></div>
+      </div>
+
+      <div class="row2" style="margin-top:10px">
+        <div><label>固格（片）</label><input id="fixed" type="number" min="0" step="1" value="0"></div>
+        <div><label>活格（片）</label><input id="adjust" type="number" min="0" step="1" value="0"></div>
+      </div>
+
+      <div class="row2" style="margin-top:10px">
+        <div><label>門片（片）</label><input id="doors" type="number" min="0" step="1" value="0"></div>
+        <div><label>抽屜（個）</label><input id="drawers" type="number" min="0" step="1" value="0"></div>
+      </div>
+
+      <div class="row2" style="margin-top:10px">
+        <div>
+          <label>滑軌</label>
+          <select id="rail">
+            <option value="0">不計滑軌</option>
+            <option value="45">45cm｜365元／組</option>
+            <option value="50">50cm｜385元／組</option>
+          </select>
+        </div>
+        <div><label>其他加工費（元）</label><input id="processing" type="number" min="0" step="1" value="0"></div>
+      </div>
+
+      <div style="margin-top:10px" class="check">
+        <input id="countertop" type="checkbox">
+        <label for="countertop" style="margin:0;color:var(--text)">加 25mm 檯面（W × D）</label>
+      </div>
+
+      <div id="doorWarn" class="warn">目前設定：櫃寬 120cm 以內，門片最多抓 2 片。請確認門片數量。</div>
+
+      <div class="actions">
+        <button class="btn" id="calcBtn">試算這座櫃</button>
+        <button class="btn secondary" id="addBtn">加入整案</button>
+      </div>
+      <p class="hint">才數公式：公分 × 公分 ÷ 900。基本櫃體自動計入：18mm 側板 2 片、18mm 頂底板 2 片、8mm 背板 1 片。固格、活格皆按 18mm 板計價。</p>
+    </section>
+
+    <section class="card">
+      <h2>價格設定</h2>
+      <div class="price-row"><div><label>18mm 板（元／才）</label><input id="p18" type="number" value="135"></div><div class="hint">側板／頂底／格板</div></div>
+      <div class="price-row"><div><label>8mm 背板（元／才）</label><input id="p8" type="number" value="100"></div><div></div></div>
+      <div class="price-row"><div><label>門片（元／才）</label><input id="pDoor" type="number" value="145"></div><div></div></div>
+      <div class="price-row"><div><label>抽屜本體（元／個）</label><input id="pDrawer" type="number" value="1000"></div><div></div></div>
+      <div class="price-row"><div><label>45cm 滑軌（元／組）</label><input id="pRail45" type="number" value="365"></div><div></div></div>
+      <div class="price-row"><div><label>50cm 滑軌（元／組）</label><input id="pRail50" type="number" value="385"></div><div></div></div>
+      <div class="price-row"><div><label>25mm 檯面（元／才）</label><input id="p25" type="number" value="280"></div><div></div></div>
+      <button class="btn secondary" id="savePrice">儲存單價</button>
+      <p class="hint">單價會存在這台裝置的瀏覽器內，可自行修改。</p>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:14px">
+    <h2>單櫃試算</h2>
+    <div id="emptyResult" class="muted">輸入尺寸後按「試算這座櫃」。</div>
+    <div id="result" style="display:none">
+      <div class="money" id="grand">$0</div>
+      <div class="muted small" id="sizeText"></div>
+      <table>
+        <thead><tr><th>項目</th><th>才數／數量</th><th>金額</th></tr></thead>
+        <tbody id="resultBody"></tbody>
+        <tfoot><tr><td colspan="2">合計</td><td id="resultTotal">$0</td></tr></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <h2 style="margin:0">整案櫃體</h2>
+      <button class="btn danger" id="clearAll" style="width:auto;padding:9px 12px">清空整案</button>
+    </div>
+    <div id="projectEmpty" class="muted" style="margin-top:10px">目前尚未加入櫃體。</div>
+    <div id="projectList"></div>
+    <div class="totals" id="projectTotals" style="display:none">
+      <div class="tot"><span class="muted small">櫃體數</span><b id="cabCount">0</b></div>
+      <div class="tot"><span class="muted small">18mm 總才數</span><b id="sum18">0</b></div>
+      <div class="tot"><span class="muted small">整案估價</span><b id="sumMoney">$0</b></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + Math.round(n).toLocaleString('zh-TW');
+const f2 = n => (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'');
+const tsai = (a,b) => a*b/900;
+
+const priceIds = ['p18','p8','pDoor','pDrawer','pRail45','pRail50','p25'];
+const defaultPrices = {p18:135,p8:100,pDoor:145,pDrawer:1000,pRail45:365,pRail50:385,p25:280};
+
+function loadPrices(){
+  const saved = JSON.parse(localStorage.getItem('cabinetPricesV1') || '{}');
+  priceIds.forEach(id => $(id).value = saved[id] ?? defaultPrices[id]);
+}
+function savePrices(){
+  const obj = {};
+  priceIds.forEach(id => obj[id] = Number($(id).value)||0);
+  localStorage.setItem('cabinetPricesV1', JSON.stringify(obj));
+}
+function prices(){
+  return Object.fromEntries(priceIds.map(id => [id, Number($(id).value)||0]));
+}
+function values(){
+  return {
+    w:Number($('w').value)||0,
+    d:Number($('d').value)||0,
+    h:Number($('h').value)||0,
+    fixed:Math.max(0,Math.floor(Number($('fixed').value)||0)),
+    adjust:Math.max(0,Math.floor(Number($('adjust').value)||0)),
+    doors:Math.max(0,Math.floor(Number($('doors').value)||0)),
+    drawers:Math.max(0,Math.floor(Number($('drawers').value)||0)),
+    rail:$('rail').value,
+    processing:Number($('processing').value)||0,
+    countertop:$('countertop').checked
+  };
+}
+
+function calculate(v){
+  const p = prices();
+  if(!v.w || !v.d || !v.h) return null;
+
+  const sideTsai = tsai(v.h,v.d)*2;
+  const topBottomTsai = tsai(v.w,v.d)*2;
+  const fixedTsai = tsai(v.w,v.d)*v.fixed;
+  const adjustTsai = tsai(v.w,v.d)*v.adjust;
+  const total18 = sideTsai+topBottomTsai+fixedTsai+adjustTsai;
+  const backTsai = tsai(v.w,v.h);
+  const doorTsai = v.doors>0 ? tsai(v.w,v.h) : 0; // 門片拆幾片，總才數仍以整體 W×H 快估
+  const counterTsai = v.countertop ? tsai(v.w,v.d) : 0;
+
+  const railPrice = v.rail==='45' ? p.pRail45 : v.rail==='50' ? p.pRail50 : 0;
+  const items = [
+    {name:'18mm 側板 2片', qty:sideTsai, unit:'才', amount:sideTsai*p.p18},
+    {name:'18mm 頂底板 2片', qty:topBottomTsai, unit:'才', amount:topBottomTsai*p.p18},
+    {name:`18mm 固格 ${v.fixed}片`, qty:fixedTsai, unit:'才', amount:fixedTsai*p.p18, hide:v.fixed===0},
+    {name:`18mm 活格 ${v.adjust}片`, qty:adjustTsai, unit:'才', amount:adjustTsai*p.p18, hide:v.adjust===0},
+    {name:'8mm 背板 1片', qty:backTsai, unit:'才', amount:backTsai*p.p8},
+    {name:`門片 ${v.doors}片`, qty:doorTsai, unit:'才', amount:doorTsai*p.pDoor, hide:v.doors===0},
+    {name:`抽屜本體 ${v.drawers}個`, qty:v.drawers, unit:'個', amount:v.drawers*p.pDrawer, hide:v.drawers===0},
+    {name:`${v.rail}cm 滑軌 ${v.drawers}組`, qty:v.drawers, unit:'組', amount:v.drawers*railPrice, hide:v.drawers===0 || railPrice===0},
+    {name:'25mm 檯面', qty:counterTsai, unit:'才', amount:counterTsai*p.p25, hide:!v.countertop},
+    {name:'其他加工費', qty:1, unit:'式', amount:v.processing, hide:v.processing<=0}
+  ].filter(x=>!x.hide);
+
+  const total = items.reduce((s,x)=>s+x.amount,0);
+  return {v,items,total,total18,backTsai,doorTsai,counterTsai};
+}
+
+let lastCalc = null;
+let project = JSON.parse(localStorage.getItem('cabinetProjectV1') || '[]');
+
+function renderCalc(c){
+  $('doorWarn').style.display = (c.v.w<=120 && c.v.doors>2) ? 'block' : 'none';
+  $('emptyResult').style.display='none';
+  $('result').style.display='block';
+  $('grand').textContent = fmt(c.total);
+  $('sizeText').textContent = `W${c.v.w} × D${c.v.d} × H${c.v.h} cm`;
+  $('resultBody').innerHTML = c.items.map(x =>
+    `<tr><td>${x.name}</td><td>${x.unit==='才'?f2(x.qty):x.qty}${x.unit}</td><td>${fmt(x.amount)}</td></tr>`
+  ).join('');
+  $('resultTotal').textContent = fmt(c.total);
+}
+function doCalc(){
+  const c = calculate(values());
+  if(!c){ alert('請先輸入 W、D、H。'); return null; }
+  lastCalc = c; renderCalc(c); return c;
+}
+function addProject(){
+  const c = doCalc(); if(!c) return;
+  project.push({...c,id:Date.now()});
+  localStorage.setItem('cabinetProjectV1', JSON.stringify(project));
+  renderProject();
+}
+function removeCab(id){
+  project = project.filter(x=>x.id!==id);
+  localStorage.setItem('cabinetProjectV1', JSON.stringify(project));
+  renderProject();
+}
+function renderProject(){
+  $('projectEmpty').style.display = project.length ? 'none':'block';
+  $('projectTotals').style.display = project.length ? 'grid':'none';
+  $('projectList').innerHTML = project.map((c,i)=>{
+    const v=c.v;
+    return `<div class="cabinet">
+      <div class="cabinet-head">
+        <div>
+          <div class="cabinet-title">櫃體 ${i+1}｜W${v.w} × D${v.d} × H${v.h}</div>
+          <div style="margin-top:6px">
+            <span class="pill">固格 ${v.fixed}</span>
+            <span class="pill">活格 ${v.adjust}</span>
+            <span class="pill">門片 ${v.doors}</span>
+            <span class="pill">抽屜 ${v.drawers}</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:800">${fmt(c.total)}</div>
+          <button onclick="removeCab(${c.id})" class="btn danger" style="margin-top:6px;width:auto;padding:6px 9px">刪除</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const sum = project.reduce((s,c)=>s+c.total,0);
+  const s18 = project.reduce((s,c)=>s+c.total18,0);
+  $('cabCount').textContent = project.length;
+  $('sum18').textContent = f2(s18)+' 才';
+  $('sumMoney').textContent = fmt(sum);
+}
+
+$('calcBtn').addEventListener('click',doCalc);
+$('addBtn').addEventListener('click',addProject);
+$('savePrice').addEventListener('click',()=>{savePrices(); alert('單價已儲存。'); if(lastCalc) doCalc();});
+$('doors').addEventListener('input',()=>{
+  const v=values();
+  $('doorWarn').style.display = (v.w<=120 && v.doors>2) ? 'block' : 'none';
+});
+$('w').addEventListener('input',()=>{
+  const v=values();
+  $('doorWarn').style.display = (v.w<=120 && v.doors>2) ? 'block' : 'none';
+});
+$('clearAll').addEventListener('click',()=>{
+  if(confirm('確定清空整案櫃體？')){
+    project=[]; localStorage.setItem('cabinetProjectV1','[]'); renderProject();
+  }
+});
+
+loadPrices();
+renderProject();
+</script>
+</body>
+</html>
