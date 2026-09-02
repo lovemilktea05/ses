@@ -91,9 +91,19 @@
         <div><label>其他加工費（元）</label><input id="processing" type="number" min="0" step="1" value="0"></div>
       </div>
 
-      <div style="margin-top:10px" class="check">
-        <input id="countertop" type="checkbox">
-        <label for="countertop" style="margin:0;color:var(--text)">加 25mm 檯面（W × D）</label>
+      <div class="row2" style="margin-top:10px">
+        <div>
+          <label>檯面</label>
+          <select id="countertopType">
+            <option value="0">不加檯面</option>
+            <option value="18">18mm 檯面（W × D）</option>
+            <option value="25">25mm 檯面（W × D）</option>
+          </select>
+        </div><div></div>
+      </div>
+      <div class="row2" style="margin-top:10px">
+        <div class="check"><input id="thickEdge" type="checkbox"><label for="thickEdge" style="margin:0;color:var(--text)">加工封邊條（厚邊）</label></div>
+        <div class="check"><input id="roundCorner" type="checkbox"><label for="roundCorner" style="margin:0;color:var(--text)">加工導圓角</label></div>
       </div>
 
       <div id="doorWarn" class="warn">目前設定：櫃寬 120cm 以內，門片最多抓 2 片。請確認門片數量。</div>
@@ -107,16 +117,19 @@
 
     <section class="card">
       <h2>價格設定</h2>
-      <div class="price-row"><div><label>18mm 板（元／才）</label><input id="p18" type="number" value="135"></div><div class="hint">側板／頂底／格板</div></div>
-      <div class="price-row"><div><label>8mm 背板（元／才）</label><input id="p8" type="number" value="100"></div><div></div></div>
-      <div class="price-row"><div><label>門片（元／才）</label><input id="pDoor" type="number" value="145"></div><div></div></div>
-      <div class="price-row"><div><label>抽屜本體（元／個）</label><input id="pDrawer" type="number" value="1000"></div><div></div></div>
-      <div class="price-row"><div><label>35cm 滑軌（元／組）</label><input id="pRail35" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
-      <div class="price-row"><div><label>40cm 滑軌（元／組）</label><input id="pRail40" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
-      <div class="price-row"><div><label>45cm 滑軌（元／組）</label><input id="pRail45" type="number" value="365"></div><div></div></div>
-      <div class="price-row"><div><label>50cm 滑軌（元／組）</label><input id="pRail50" type="number" value="385"></div><div></div></div>
-      <div class="price-row"><div><label>55cm 滑軌（元／組）</label><input id="pRail55" type="number" value="0" placeholder="自行填寫"></div><div></div></div>
-      <div class="price-row"><div><label>25mm 檯面（元／才）</label><input id="p25" type="number" value="280"></div><div></div></div>
+      <div class="price-row"><div><label>18mm 板（元／才）</label><input id="p18" type="number" value="" placeholder="自行填寫"></div><div class="hint">側板／頂底／格板</div></div>
+      <div class="price-row"><div><label>8mm 背板（元／才）</label><input id="p8" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>門片（元／才）</label><input id="pDoor" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>抽屜本體（元／個）</label><input id="pDrawer" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>35cm 滑軌（元／組）</label><input id="pRail35" type="number" value="" placeholder="自行填寫" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>40cm 滑軌（元／組）</label><input id="pRail40" type="number" value="" placeholder="自行填寫" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>45cm 滑軌（元／組）</label><input id="pRail45" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>50cm 滑軌（元／組）</label><input id="pRail50" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>55cm 滑軌（元／組）</label><input id="pRail55" type="number" value="" placeholder="自行填寫" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>18mm 檯面（元／才）</label><input id="pTop18" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>25mm 檯面（元／才）</label><input id="p25" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>加工封邊條（厚邊）（元／次）</label><input id="pThickEdge" type="number" value="" placeholder="自行填寫"></div><div></div></div>
+      <div class="price-row"><div><label>加工導圓角（元／次）</label><input id="pRoundCorner" type="number" value="" placeholder="自行填寫"></div><div></div></div>
       <button class="btn secondary" id="savePrice">儲存單價</button>
       <p class="hint">單價會存在這台裝置的瀏覽器內，可自行修改。</p>
     </section>
@@ -157,17 +170,17 @@ const fmt = n => '$' + Math.round(n).toLocaleString('zh-TW');
 const f2 = n => (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'');
 const tsai = (a,b) => a*b/900;
 
-const priceIds = ['p18','p8','pDoor','pDrawer','pRail35','pRail40','pRail45','pRail50','pRail55','p25'];
-const defaultPrices = {p18:135,p8:100,pDoor:145,pDrawer:1000,pRail35:0,pRail40:0,pRail45:365,pRail50:385,pRail55:0,p25:280};
+const priceIds = ['p18','p8','pDoor','pDrawer','pRail35','pRail40','pRail45','pRail50','pRail55','pTop18','p25','pThickEdge','pRoundCorner'];
+const defaultPrices = {p18:'',p8:'',pDoor:'',pDrawer:'',pRail35:'',pRail40:'',pRail45:'',pRail50:'',pRail55:'',pTop18:'',p25:'',pThickEdge:'',pRoundCorner:''};
 
 function loadPrices(){
-  const saved = JSON.parse(localStorage.getItem('cabinetPricesV1') || '{}');
-  priceIds.forEach(id => $(id).value = saved[id] ?? defaultPrices[id]);
+  const saved = JSON.parse(localStorage.getItem('cabinetPricesV2') || '{}');
+  priceIds.forEach(id => $(id).value = saved[id] ?? '');
 }
 function savePrices(){
   const obj = {};
   priceIds.forEach(id => obj[id] = Number($(id).value)||0);
-  localStorage.setItem('cabinetPricesV1', JSON.stringify(obj));
+  localStorage.setItem('cabinetPricesV2', JSON.stringify(obj));
 }
 function prices(){
   return Object.fromEntries(priceIds.map(id => [id, Number($(id).value)||0]));
@@ -183,7 +196,9 @@ function values(){
     drawers:Math.max(0,Math.floor(Number($('drawers').value)||0)),
     rail:$('rail').value,
     processing:Number($('processing').value)||0,
-    countertop:$('countertop').checked
+    countertopType:$('countertopType').value,
+    thickEdge:$('thickEdge').checked,
+    roundCorner:$('roundCorner').checked
   };
 }
 
@@ -198,7 +213,8 @@ function calculate(v){
   const total18 = sideTsai+topBottomTsai+fixedTsai+adjustTsai;
   const backTsai = tsai(v.w,v.h);
   const doorTsai = v.doors>0 ? tsai(v.w,v.h) : 0; // 門片拆幾片，總才數仍以整體 W×H 快估
-  const counterTsai = v.countertop ? tsai(v.w,v.d) : 0;
+  const counterTsai = v.countertopType!=='0' ? tsai(v.w,v.d) : 0;
+  const counterPrice = v.countertopType==='18' ? p.pTop18 : v.countertopType==='25' ? p.p25 : 0;
 
   const railMap = {'35':p.pRail35,'40':p.pRail40,'45':p.pRail45,'50':p.pRail50,'55':p.pRail55};
   const railPrice = railMap[v.rail] || 0;
@@ -211,7 +227,9 @@ function calculate(v){
     {name:`門片 ${v.doors}片`, qty:doorTsai, unit:'才', amount:doorTsai*p.pDoor, hide:v.doors===0},
     {name:`抽屜本體 ${v.drawers}個`, qty:v.drawers, unit:'個', amount:v.drawers*p.pDrawer, hide:v.drawers===0},
     {name:`${v.rail}cm 滑軌 ${v.drawers}組`, qty:v.drawers, unit:'組', amount:v.drawers*railPrice, hide:v.drawers===0 || railPrice===0},
-    {name:'25mm 檯面', qty:counterTsai, unit:'才', amount:counterTsai*p.p25, hide:!v.countertop},
+    {name:`${v.countertopType}mm 檯面`, qty:counterTsai, unit:'才', amount:counterTsai*counterPrice, hide:v.countertopType==='0'},
+    {name:'加工封邊條（厚邊）', qty:1, unit:'次', amount:p.pThickEdge, hide:!v.thickEdge},
+    {name:'加工導圓角', qty:1, unit:'次', amount:p.pRoundCorner, hide:!v.roundCorner},
     {name:'其他加工費', qty:1, unit:'式', amount:v.processing, hide:v.processing<=0}
   ].filter(x=>!x.hide);
 
